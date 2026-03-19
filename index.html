@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<style>
+					* { box-sizing: border-box; }
+					
+					html, body {
+						margin: 0;
+						padding: 0;
+						width: 100%;
+						overflow-x: hidden;
+					}
+					
+					#postcode {
+						width: 100%;
+						max-width: 100%;
+						height: 600px;
+						overflow: hidden;
+					}
+				</style>
+				<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	</head>
+	
+	<body>
+		<div id="postcode"></div>
+		
+		<script>
+			window.onload = function () {
+				if (window.webkit &&
+					window.webkit.messageHandlers &&
+					window.webkit.messageHandlers.callBackHandler) {
+					window.webkit.messageHandlers.callBackHandler.postMessage({
+						type: "ready",
+						zonecode: "",
+						address: ""
+					});
+				}
+					
+					if (typeof daum === "undefined" || !daum.Postcode) {
+						console.log("daum.Postcode not loaded");
+						return;
+					}
+					
+					var target = document.getElementById("postcode");
+					if (!target) {
+						console.log("postcode element not found");
+						return;
+					}
+					
+					new daum.Postcode({
+						width: "100%",
+						oncomplete: function(data) {
+							var fullAddr = data.address || "";
+							var zonecode = data.zonecode || "";
+							
+							if (window.webkit &&
+								window.webkit.messageHandlers &&
+								window.webkit.messageHandlers.callBackHandler) {
+								window.webkit.messageHandlers.callBackHandler.postMessage({
+									type: "address",
+									zonecode: zonecode,
+									address: fullAddr
+								});
+							}
+						}
+					}).embed(target);
+			};
+		</script>
+	</body>
+</html>
